@@ -7,11 +7,16 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Select Xcode 16
+      run: |
+        sudo xcode-select -s $(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+        xcodebuild -version
 
     - name: Install xcodegen
       run: brew install xcodegen
@@ -30,15 +35,14 @@ jobs:
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO \
           ONLY_ACTIVE_ARCH=NO \
-          -archivePath ${{ github.workspace }}/build/PUBGSkinChanger.xcarchive \
+          -archivePath $GITHUB_WORKSPACE/build/PUBGSkinChanger.xcarchive \
           archive
 
     - name: Package IPA
       run: |
         mkdir -p build/Payload
         cp -r "build/PUBGSkinChanger.xcarchive/Products/Applications/PUBGSkinChanger.app" build/Payload/
-        cd build
-        zip -r PUBGSkinChanger.ipa Payload/
+        cd build && zip -r PUBGSkinChanger.ipa Payload/
 
     - name: Upload IPA
       uses: actions/upload-artifact@v4
