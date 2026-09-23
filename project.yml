@@ -1,0 +1,55 @@
+name: PUBGSkinChanger
+options:
+  bundleIdPrefix: com.pubgskin
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.4"
+
+targets:
+  PUBGSkinChanger:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: PUBGSkinChanger
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pubgskin.app
+        PRODUCT_NAME: PUBGSkinChanger
+        SWIFT_VERSION: 5.9
+        TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+    entitlements:
+      path: PUBGSkinChanger/PUBGSkinChanger.entitlements
+      properties:
+        com.apple.security.network.client: true
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+
+  PUBGTunnel:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: PUBGTunnel
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pubgskin.app.tunnel
+        PRODUCT_NAME: PUBGTunnel
+        SWIFT_VERSION: 5.9
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).PacketTunnelProvider"
+    entitlements:
+      path: PUBGTunnel/PUBGTunnel.entitlements
+      properties:
+        com.apple.security.network.client: true
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider

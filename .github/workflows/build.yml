@@ -1,0 +1,48 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install xcodegen
+      run: brew install xcodegen
+
+    - name: Generate Xcode project
+      run: xcodegen generate
+
+    - name: Build Archive
+      run: |
+        xcodebuild \
+          -project PUBGSkinChanger.xcodeproj \
+          -scheme PUBGSkinChanger \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          ONLY_ACTIVE_ARCH=NO \
+          -archivePath ${{ github.workspace }}/build/PUBGSkinChanger.xcarchive \
+          archive
+
+    - name: Package IPA
+      run: |
+        mkdir -p build/Payload
+        cp -r "build/PUBGSkinChanger.xcarchive/Products/Applications/PUBGSkinChanger.app" build/Payload/
+        cd build
+        zip -r PUBGSkinChanger.ipa Payload/
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: PUBGSkinChanger-IPA
+        path: build/PUBGSkinChanger.ipa
+        retention-days: 30
